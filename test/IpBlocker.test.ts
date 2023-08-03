@@ -3,10 +3,9 @@ import 'mocha';
 import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
-import {BlockRule, IpBlockCacheDriver, IpBlocker} from '../src';
+import {BlockRule, IpAddress, IpBlockCacheDriver, IpBlocker} from '../src';
 import {Address6} from 'ip-address';
 import {ExpireTimeoutCache} from '@avanio/expire-cache';
-import {IpAddress} from '../src/types/IpAddress';
 
 const ipv6LinkLocal = new Address6('fe80::/64');
 
