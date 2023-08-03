@@ -4,8 +4,11 @@ import * as chai from 'chai';
 import * as chaiAsPromised from 'chai-as-promised';
 import * as sinon from 'sinon';
 import {BlockRule, IpBlockCacheDriver, IpBlocker} from '../src';
+import {Address6} from 'ip-address';
 import {ExpireTimeoutCache} from '@avanio/expire-cache';
 import {IpAddress} from '../src/types/IpAddress';
+
+const ipv6LinkLocal = new Address6('fe80::/64');
 
 chai.use(chaiAsPromised);
 
@@ -18,7 +21,7 @@ const rule: BlockRule = {
 	delay: 100,
 	delayThreshold: 2,
 	duration: 10000, // 10 seconds
-	whiteList: ['10.0.0.0'],
+	whiteList: ['10.0.0.0/8', ipv6LinkLocal],
 };
 
 let blocker: IpBlocker;
@@ -36,8 +39,11 @@ describe('IpBlocker', () => {
 			blocker.onBlockEvent(onBlockSpy);
 			await blocker.init();
 		});
+		it('should be valid whitelist values', async () => {
+			expect((await blocker.checkIp('10.0.0.5')).unwrap()).to.be.eql({delay: 0, blocked: false, count: 0});
+			expect((await blocker.checkIp('fe80::200:5aee:feaa:20a2')).unwrap()).to.be.eql({delay: 0, blocked: false, count: 0});
+		});
 		it('should be valid isBlocked values', async () => {
-			expect((await blocker.checkIp('10.0.0.0')).unwrap()).to.be.eql({delay: 0, blocked: false, count: 0});
 			expect((await blocker.checkIp('::1')).unwrap()).to.be.eql({delay: 0, blocked: false, count: 1});
 			expect((await blocker.checkIp('127.0.0.1')).unwrap()).to.be.eql({delay: 0, blocked: false, count: 1});
 			expect(onBlockSpy.callCount).to.be.eq(0);

@@ -1,3 +1,4 @@
+import {Address4, Address6} from 'ip-address';
 export type BlockRule = {
 	/**
 	 * The number of times an IP address can be accessed before it is blocked.
@@ -15,7 +16,7 @@ export type BlockRule = {
 	 * The amount of time to delay the response.
 	 */
 	delay?: number;
-	whiteList?: string[];
+	whiteList?: (string | Address4 | Address6)[];
 };
 
 export type BlockRuleWithDelay = Required<BlockRule>;

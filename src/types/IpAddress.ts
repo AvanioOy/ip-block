@@ -1,3 +1,4 @@
+import {Address4, Address6} from 'ip-address';
 import {isIP as nodeIsIp} from 'net';
 
 /**
@@ -20,5 +21,22 @@ export function isIpAddress(ip: unknown): ip is IpAddress {
 export function assertIpAddress(ip: unknown): asserts ip is IpAddress {
 	if (!isIpAddress(ip)) {
 		throw new TypeError(`Invalid IP address: ${String(ip)}`);
+	}
+}
+
+export function getIpAddress(rawIp: unknown): Address4 | Address6 {
+	if (typeof rawIp !== 'string') {
+		// istanbul ignore next
+		throw new TypeError(`Invalid IP address: ${String(rawIp)}`);
+	}
+	const [ip] = rawIp.split('/', 2);
+	const ipType = nodeIsIp(ip);
+	switch (ipType) {
+		case 4:
+			return new Address4(rawIp);
+		case 6:
+			return new Address6(rawIp);
+		default: // istanbul ignore next
+			throw new TypeError(`Invalid IP address: ${String(ip)}`);
 	}
 }

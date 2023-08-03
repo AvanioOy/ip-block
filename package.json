@@ -76,6 +76,7 @@
 	"dependencies": {
 		"@avanio/expire-cache": "^0.3.2",
 		"@avanio/logger-like": "^0.1.1",
+		"ip-address": "^8.1.0",
 		"mharj-result": "^0.5.1"
 	}
 }

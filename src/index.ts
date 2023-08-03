@@ -1,7 +1,8 @@
+import {Address4, Address6} from 'ip-address';
+import {assertIpAddress, getIpAddress} from './types/IpAddress';
 import {BlockRule, haveRuleDelay} from './types/BlockRule';
 import {Err, Ok, Result} from 'mharj-result';
 import {ILoggerLike, LogLevel, LogMapping, MapLogger} from '@avanio/logger-like';
-import {assertIpAddress} from './types/IpAddress';
 import {BlockResponse} from './types/BlockResponse';
 import {IBlockIpDriver} from './interfaces/IBlockIpDriver';
 import {Loadable} from './types/Loadable';
@@ -51,6 +52,7 @@ export class IpBlocker {
 	private driver: Loadable<IBlockIpDriver>;
 	private blockRule: Loadable<BlockRule>;
 	private handleBlockEvent = new Set<EventCallback>();
+	private whiteList: (Address4 | Address6)[] | undefined | null = null;
 
 	constructor(blockRule: Loadable<BlockRule>, driver: Loadable<IBlockIpDriver>, logger?: ILoggerLike, logMapping?: Partial<IpBlockerLogMapType>) {
 		this.blockRule = blockRule;
@@ -103,7 +105,7 @@ export class IpBlocker {
 			const driver = await this.getDriver();
 			assertIpAddress(ip);
 			const blockRule = await this.getBlockRule();
-			if (blockRule.whiteList?.includes(ip)) {
+			if (await this.checkIpInWhiteList(ip)) {
 				this.logger.logKey('whiteListed', `IpBlocker: Whitelisted IP ${ip}`);
 				return Ok({blocked: false, delay: 0, count: 0}); // ip is whitelisted
 			}
@@ -121,6 +123,20 @@ export class IpBlocker {
 			// istanbul ignore next
 			return Err(asError(err));
 		}
+	}
+
+	private async checkIpInWhiteList(ip: string): Promise<boolean> {
+		const whiteList = await this.getWhiteList();
+		if (!whiteList) {
+			return false;
+		}
+		const address = getIpAddress(ip);
+		for (const rangeAddress of whiteList) {
+			if (address.isInSubnet(rangeAddress)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -181,6 +197,18 @@ export class IpBlocker {
 			this.blockRule = this.blockRule();
 		}
 		return this.blockRule;
+	}
+
+	private async getWhiteList(): Promise<(Address4 | Address6)[] | undefined> {
+		// check if initial value is null
+		if (this.whiteList === null) {
+			const blockRule = await this.getBlockRule();
+			if (!blockRule.whiteList) {
+				return undefined; // no whitelist
+			}
+			this.whiteList = blockRule.whiteList.map((ip) => (typeof ip === 'string' ? getIpAddress(ip) : ip));
+		}
+		return this.whiteList;
 	}
 
 	private async getDriver(): Promise<IBlockIpDriver> {

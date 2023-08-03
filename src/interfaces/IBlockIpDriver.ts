@@ -26,10 +26,10 @@ export interface IBlockIpDriver {
 	 */
 	removeIp(ip: IpAddress): Promise<boolean> | boolean;
 	/**
-	 * Call a callback when the entry is cleared
+	 * Call a callback when the entries are cleared
 	 * @param callback - The callback to get iterator of removed entries
 	 */
-	onClear(callback: (entries: AsyncIterable<[IpAddress, number]> | Iterable<[IpAddress, number]>) => Promise<void>): void;
+	onClear(callback: (clearedEntries: AsyncIterable<[IpAddress, number]> | Iterable<[IpAddress, number]>) => Promise<void>): void;
 	/**
 	 * Get an iterator of all entries ip and hits count entries
 	 */
