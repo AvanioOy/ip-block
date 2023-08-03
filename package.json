@@ -1,6 +1,6 @@
 {
 	"name": "@avanio/ip-block",
-	"version": "0.0.1",
+	"version": "0.0.2",
 	"description": "Util to block IP",
 	"main": "./dist/index.js",
 	"scripts": {
