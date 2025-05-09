@@ -1,11 +1,12 @@
 {
+	"$schema": "https://json.schemastore.org/tsconfig",
 	"compilerOptions": {
-		"module": "commonjs",
+		"module": "preserve",
 		"target": "es2020",
 		"lib": ["es2020"],
 		"rootDir": "./src",
 		"outDir": "./dist",
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"sourceRoot": "./src",
 		"types": ["node"],
 		"sourceMap": true,
@@ -27,5 +28,5 @@
 		"out": "docs"
 	},
 	"include": ["src/**/*", "src/**/**/*"],
-	"exclude": ["node_modules", "**/*.spec.ts", "test"]
+	"exclude": ["node_modules", "**/*.spec.ts", "test", "vite.config.mts"]
 }

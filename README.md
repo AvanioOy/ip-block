@@ -24,9 +24,9 @@ import {Address6} from 'ip-address';
 
 const ipv6LinkLocal = new Address6('fe80::/64');
 const rule: BlockRule = {
-	count: 100,
-	delay: 100,
-	delayThreshold: 50,
+	count: 100, // tries in duration
+	delay: 100, // delay used by delayThreshold to add delay 
+	delayThreshold: 50, // after 50 we can add delay to next request
 	duration: 60000, // 60 seconds
 	whiteList: ['10.0.0.0/8', ipv6LinkLocal],
 };
@@ -34,13 +34,10 @@ const rule: BlockRule = {
 const blockerDrivers = new IpBlockCacheDriver(new ExpireTimeoutCache<number, IpAddress>());
 const blocker = new IpBlocker(rule, blockerDrivers);
 
-blocker.onBlockEvent(async (ip, isBlocked) => {
-	// can extended to other services like Firewall rules
+// 'blocked' event is triggered when ip is blocked or unblocked
+blocker.on('blocked', async (ip, isBlocked) => {
+	// can extended to other services like apply actual Firewall rules.
 });
-
-function sleep(ms: number) {
-	return new Promise((resolve) => setTimeout(resolve, ms));
-}
 
 const blockerMiddleware: RequestHandler = async (req, res, next) => {
 	const blockRes = await blocker.checkIp(req.ip);
@@ -52,7 +49,7 @@ const blockerMiddleware: RequestHandler = async (req, res, next) => {
 		return res.status(429).send('Too many requests');
 	}
 	if (delay > 0) {
-		await sleep(delay); // sleep for delay milliseconds
+		await new Promise((resolve) => setTimeout(resolve, delay)); // sleep for delay milliseconds
 	}
 	next();
 };

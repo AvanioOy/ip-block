@@ -1,9 +1,5 @@
-import 'mocha';
-import * as chai from 'chai';
-
-import {getIpAddress} from '../src/';
-
-const expect = chai.expect;
+import {describe, expect, it} from 'vitest';
+import {getIpAddress} from '../src';
 
 describe('buildDelay', () => {
 	it('should be valid delay values', () => {

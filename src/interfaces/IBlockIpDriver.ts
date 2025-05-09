@@ -1,6 +1,11 @@
-import {IpAddress} from '../types/IpAddress';
+import {type EventEmitter} from 'events';
+import {type IpAddress} from '../types/IpAddress';
 
-export interface IBlockIpDriver {
+export type IpBlockCacheDriverEventMap = {
+	expires: [address: IpAddress];
+};
+
+export interface IBlockIpDriver extends EventEmitter<IpBlockCacheDriverEventMap> {
 	/**
 	 * Initialize the driver
 	 */
@@ -25,11 +30,6 @@ export interface IBlockIpDriver {
 	 * @returns {Promise<boolean> | boolean} - If the IP was removed
 	 */
 	removeIp(ip: IpAddress): Promise<boolean> | boolean;
-	/**
-	 * Call a callback when the entries are cleared
-	 * @param callback - The callback to get iterator of removed entries
-	 */
-	onClear(callback: (clearedEntries: AsyncIterable<[IpAddress, number]> | Iterable<[IpAddress, number]>) => Promise<void>): void;
 	/**
 	 * Get an iterator of all entries ip and hits count entries
 	 */

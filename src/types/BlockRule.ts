@@ -1,4 +1,5 @@
-import {Address4, Address6} from 'ip-address';
+import {type Address4, type Address6} from 'ip-address';
+
 export type BlockRule = {
 	/**
 	 * The number of times an IP address can be accessed before it is blocked.
@@ -21,6 +22,12 @@ export type BlockRule = {
 
 export type BlockRuleWithDelay = Required<BlockRule>;
 
+/**
+ * Check if a block rule has a delay.
+ * @param {BlockRule} rule - The block rule to check.
+ * @returns {boolean} - If the rule has a delay.
+ * @since v0.0.1
+ */
 export function haveRuleDelay(rule: BlockRule): rule is BlockRuleWithDelay {
 	return rule.delayThreshold !== undefined && rule.delay !== undefined;
 }

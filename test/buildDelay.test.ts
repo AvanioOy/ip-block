@@ -1,11 +1,5 @@
-import 'mocha';
-import * as chai from 'chai';
-import * as chaiAsPromised from 'chai-as-promised';
-import {BlockRule, buildDelay} from '../src/';
-
-chai.use(chaiAsPromised);
-
-const expect = chai.expect;
+import {describe, expect, it} from 'vitest';
+import {type BlockRule, buildDelay} from '../src';
 
 const rule: BlockRule = {
 	count: 5,
